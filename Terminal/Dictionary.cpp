@@ -122,7 +122,7 @@ GameWords Dictionary::GenerateGame(difficulty diff)
 		break;
 	}
 
-	std::vector<Word> likenesses[10];
+	std::vector<Word> likenesses[11];
 	for (std::pair<int, std::string> wordPair : tempWords) {
 		Word w = Word(wordPair.second, &baseWord);
 		likenesses[w.GetLikeness()].push_back(w);
@@ -140,15 +140,16 @@ GameWords Dictionary::GenerateGame(difficulty diff)
 	for (int i = 0; i < wordLength; i++) {
 		std::uniform_int_distribution<int> QuantityDistr(0, 3);
 		int random = std::min(maxWords, QuantityDistr(engine));
-		maxWords -= random;
-
 		for (int j = 0; j < random; j++) {
 			std::uniform_int_distribution<int> PositionDistr(0, likenesses[i].size());
 			int pos = PositionDistr(engine);
 			std::vector<Word>::iterator iter = likenesses[i].begin();
-			std::advance(iter, pos);
-			gameWords.push_back(*iter);
-			likenesses[i].erase(iter);
+			if (iter != likenesses[i].end()) {
+				std::advance(iter, pos);
+				gameWords.push_back(*iter);
+				likenesses[i].erase(iter);
+				maxWords--;
+			}
 		}
 	}
 
